@@ -201,6 +201,7 @@ Fill in the **Your guess** column of the scoreboard now: κ for Haiku as judge, 
 - 10 cases in `evals/cases.yaml`: ~6 normal, 2 edge cases, 1 "the right answer is I don't know", 1 adversarial
 - Every case gets **cheap checks first** (`contains`, `is-json`, `python`), and a judge check only where code can't decide
 - ⚠️ Write the expected answers yourself, not with the model (same rule as mini-agent)
+- ⚠️ A `defaultTest` assertion applies to **every** case, including ones it makes no sense for (Day 1: "is it funny" graded "What is 2+2?" and failed it). Keep only universal checks there (cost, latency); put rubrics on the cases they belong to.
 
 ```yaml
 - description: refund after 45 days asks about exceptions

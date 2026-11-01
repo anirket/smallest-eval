@@ -2,14 +2,9 @@ from dotenv import load_dotenv
 from anthropic import Anthropic
 import os
 from config import MODEL, MAX_TOKENS, MODEL_COST, USD_RATE
-from pydantic import BaseModel, Field
 
 load_dotenv()
 api_key = os.environ['ANTHROPIC_API_KEY']
-
-
-class Result(BaseModel):
-    response: str = Field(..., description="response from LLM")
 
 
 def call_llm(prompt):
@@ -20,11 +15,10 @@ def call_llm(prompt):
             'content': prompt
         }
     ]
-    result = anthropic.messages.parse(
+    result = anthropic.messages.create(
         model=MODEL,
         max_tokens=MAX_TOKENS,
-        messages=messages,
-        output_format=Result
+        messages=messages
     )
     response = ''
     usage = result.usage
