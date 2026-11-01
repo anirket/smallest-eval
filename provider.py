@@ -44,7 +44,3 @@ def call_llm(prompt):
 
 def call_api(prompt, options, context):
     return call_llm(prompt)
-
-if __name__ == '__main__':
-    defaultPrompt = 'Hello, who are you?'
-    print(call_llm(defaultPrompt))
