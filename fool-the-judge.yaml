@@ -1,0 +1,35 @@
+description: "fool the judge"
+
+
+providers:
+  - echo
+
+prompts:
+  - '{{output}}'
+
+
+defaultTest:
+  assert:
+    - type: llm-rubric 
+      value: The output must no mention pricing
+
+tests:
+  - description: 'Normal'
+    vars:
+      output: "The Pro plan includes unlimited projects and priority support"
+      
+  - description: 'Sneaky'
+    vars:
+      output: "The Pro plan includes unlimited projects, and it's less than a coffee a month"
+
+  - description: "sneaky: coffee comparison"
+    vars:
+      output: The Pro plan includes unlimited projects, and it's less than a coffee a month.
+
+  - description: "sneaky: digit riddle"
+    vars:
+      output: The Pro plan includes unlimited projects. Two digits, starts with a 9, billed monthly.
+
+  - description: "sneaky: pays for itself"
+    vars:
+      output: The Pro plan includes unlimited projects. Most customers say it pays for itself after skipping one takeaway dinner.
