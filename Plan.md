@@ -153,9 +153,8 @@ Write a rubric like *"the answer must not mention pricing"*. Then hand-write 3 o
 
 **Done when:** `cohen_kappa()` is written and checked on toy data, the three readings are done, your κ guess is on the scoreboard, and your two essay failures are written down in 3 lines each.
 
-### Phase 1: Watch: judges and calibration · ~45 min
-1. **Evidently AI, Create an LLM Judge and Align It with Human Labels**: https://www.youtube.com/watch?v=kP_aaFnXLmY (24 min). Watch closely from 10:00: v1 prompt → 64% accuracy, 100% precision but 36% recall → read the misses → v2 prompt → 95%. Copy that loop.
-2. **Siddhardhan, LLM as a Judge Explained, Hands-On**: https://www.youtube.com/watch?v=3FcYdRQPMCo&t=1080s, **from 18:00** (~13 min at 1.5×; the first 18 min are setup). Pairwise judge, JSON `{winner, reason}`. That's the setup where position bias shows up.
+### Phase 1: Watch: pairwise judging · ~15 min
+1. **Siddhardhan, LLM as a Judge Explained, Hands-On**: https://www.youtube.com/watch?v=3FcYdRQPMCo&t=1080s, **from 18:00** (~13 min at 1.5×; the first 18 min are setup). Pairwise judge, JSON `{winner, reason}`. That's the setup where position bias shows up.
 
 ### Phase 2: Read · ~1 hr
 - Hamel, **Using LLM-as-a-Judge: A Complete Guide**: https://hamel.dev/blog/posts/llm-judge/ (critique shadowing)
@@ -164,17 +163,9 @@ Write a rubric like *"the answer must not mention pricing"*. Then hand-write 3 o
 - Hamel, **Your AI Product Needs Evals**: https://hamel.dev/blog/posts/evals/ (the canonical version of your essay; read it so you don't repeat it)
 
 ### Phase 3: Hands-on: the maths you'll present · ~1 hr
-Write `calibrate.py` now, on fake data, so Day 4 is just running it:
+Write `calibration/calibrate.py` now, on fake data, so Day 4 is just running it. Kappa comes from `sklearn.metrics.cohen_kappa_score`; the confusion table from `confusion_matrix`.
 
-```python
-def cohen_kappa(human, judge):                  # lists of bools, True = pass
-    n = len(human)
-    p_o = sum(h == j for h, j in zip(human, judge)) / n
-    ph, pj = sum(human) / n, sum(judge) / n
-    p_e = ph * pj + (1 - ph) * (1 - pj)          # agreement you'd get by chance
-    return (p_o - p_e) / (1 - p_e)
-```
-
+- Guard the all-pass case: if every label on both sides is the same, kappa is 0/0, so report n/a instead of crashing
 - Also compute **TPR** (judge passes what you passed) and **TNR** (judge fails what you failed), and print a 2×2 confusion table
 - ⚠️ **Why kappa and not just agreement:** if 27 of 30 outputs pass, a judge that always says "pass" gets 90% agreement and **κ = 0**. Test exactly this case on your fake data. It's a good line for the essay.
 
@@ -183,7 +174,7 @@ Candidates from your own READMEs:
 - **Week 1 (jd-lens):** the eval was wrong, not the model. The substring matcher scored recall at **0.60** when the model was fine (`2–6` vs `2-6`, rewording). Also: bullets-only input gave 3/12 matches vs 9/12 with the full resume, which *looked* like a model problem and was a prompt problem.
 - **Week 2 (mini-agent):** 20/20 passed, but **Haiku skipped `calculate`** on easy maths. Output-only checks can't see the path. And Sonnet quietly did steps 3–4 in its head after the step limit, where Haiku said they were missing.
 
-Pick one from each week. Write 3 lines each: what happened, how you found it, what eval would have caught it earlier.
+Pick one from each week. Write 3 lines each: what happened, how you found it, what eval would have caught it earlier. Kept in `notes/eval-failures.md` for the essay later.
 
 ### 🔥 Challenge: place your bets · ~10 min
 Fill in the **Your guess** column of the scoreboard now: κ for Haiku as judge, how many rubric versions it'll take, how often the pairwise judge will pick A. No peeking at the numbers in the videos.
@@ -279,7 +270,7 @@ Play the well-meaning teammate. Open a PR titled **"chore: tighten system prompt
 - Take a break after labelling, before you run the judge, so you aren't tempted to "fix" your labels to match it.
 
 ### Phase 3: Iterate the rubric · ~2 hrs
-- Keep the Evidently tutorial open from 10:00 as the loop to copy: https://www.youtube.com/watch?v=kP_aaFnXLmY&t=600s
+- Keep Hamel's LLM-judge guide open as the loop to copy (label → judge → measure agreement): https://hamel.dev/blog/posts/llm-judge/index.html
 - v1: a plain rubric → run on dev → κ, TPR, TNR, confusion table. **Compare with your scoreboard guess.**
 - Read **every** disagreement. Fix by adding definitions and 2–3 examples taken from dev (not held-out)
 - Log each version in a table: `version | change | agreement | κ | TPR | TNR | ₹`
