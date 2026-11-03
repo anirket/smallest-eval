@@ -16,6 +16,5 @@ SYSTEM= f"""You are a helpful customer support assistant. You answer user querie
     
     {getPolicy()}
 
-    For any other unrelated queries or outside the above knowledge base, never assume, simply
-    say you dont know about it and an employee will shortly connect with you.
+    
 """
