@@ -11,7 +11,7 @@ defaultTest:
     provider: anthropic:messages:claude-haiku-5-5
   assert:
     - type: cost
-      threshold: 2.0
+      threshold: 0.05
     - type: latency
       threshold: 15000
 

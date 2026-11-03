@@ -52,7 +52,7 @@ Then add your key to the repo: `gh secret set ANTHROPIC_API_KEY`.
 
 ## Cost
 
-One run of the 10 example cases costs about **₹2.5 for the app plus about ₹2 for the judge** (Haiku, at the prices in `app/config.py` and ₹100 per USD). Check those prices against Anthropic's pricing page before trusting the ₹ figures.
+One run of the 10 example cases costs about **₹0.12 for the app plus about ₹0.10 for the judge**: both are Haiku 5.5 ($0.10 / $0.50 per million tokens, ₹100 per USD, prices in `app/config.py`). Each case is capped at ₹0.05 by the `cost` check in `promptfooconfig.yaml`. If you change the model, update the prices in `app/config.py` too, or every ₹ figure will be wrong.
 
 ## Known limits
 

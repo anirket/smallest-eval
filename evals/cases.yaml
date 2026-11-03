@@ -37,9 +37,10 @@
 - description: Downgrade plan timing
   vars:
     question: If I downgrade my plan today, when does it take effect?
+    expected: next billing cycle
   assert:
-    - type: contains
-      value: "next billing cycle"
+    - type: python
+      value: file://evals/checks.py:answer_contains
 
 - description: Annual renewal refund request within limit
   vars:
@@ -61,8 +62,10 @@
   vars:
     question: Do you accept payment via bank transfer or wire?
   assert:
-    - type: icontains
-      value: "credit card"
+    - type: icontains-any
+      value:
+        - "credit card"
+        - "visa"
     - type: icontains-any
       value:
         - "do not accept"

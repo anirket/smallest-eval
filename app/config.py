@@ -3,9 +3,9 @@ from pathlib import Path
 MODEL = 'claude-haiku-5-5'
 MAX_TOKENS = 2048
 USD_RATE = 100
-MODEL_COST = {
-    'in': 2,
-    'out': 10
+MODEL_COST = {  # USD per million tokens, Haiku 5.5
+    'in': 0.10,
+    'out': 0.50
 }
 
 def getPolicy():
