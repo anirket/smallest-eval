@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 from anthropic import Anthropic
 import os
-from config import MODEL, MAX_TOKENS, MODEL_COST, USD_RATE
+from config import MODEL, MAX_TOKENS, MODEL_COST, USD_RATE, SYSTEM
 
 load_dotenv()
 api_key = os.environ['ANTHROPIC_API_KEY']
@@ -17,6 +17,7 @@ def call_llm(prompt):
     ]
     result = anthropic.messages.create(
         model=MODEL,
+        system=SYSTEM,
         max_tokens=MAX_TOKENS,
         messages=messages
     )

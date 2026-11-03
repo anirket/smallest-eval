@@ -1,0 +1,10 @@
+1. Support Hours: Customer support operates Monday through Friday, 9:00 AM to 6:00 PM EST. Inquiries received outside these hours will be addressed on the next business day.
+2. Subscription Plans: We offer two subscription tiers: Monthly ($15/month) and Annual ($120/year). All plans auto-renew automatically unless canceled.
+3. Plan Changes: Upgrades take effect immediately, charging the prorated difference. Downgrades take effect at the start of the next billing cycle.
+4. Refund Window: Full refunds are available within 14 days of initial subscription purchase. No refunds are granted after 14 days.
+5. Renewal Refunds: Annual subscription renewals are eligible for a full refund within 7 days of the renewal charge. Monthly renewals are non-refundable.
+6. Cancellation Policy: Users can cancel their subscription at any time via Account Settings. Access remains active until the end of the current paid billing period.
+7. Account Termination: Accounts flagged for violation of terms of service will be suspended immediately without entitlement to a refund.
+8. Payment Methods: We accept major credit cards (Visa, Mastercard, Amex) and PayPal. We do not accept bank transfers or check payments.
+9. Failed Payments: If a recurring payment fails, a 3-day grace period is provided. If payment is not updated within 3 days, account features will be paused.
+10. Promotional Pricing: Discount codes and promotional pricing apply to the first billing cycle only, after which standard rates apply.
