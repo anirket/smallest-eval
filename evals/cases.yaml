@@ -2,11 +2,12 @@
   vars:
     question: Can I get a refund after 10 days?
   assert:
-    - type: icontains-all
-      threshold: 0.8
-      value: 
-        - "yes"
+    - type: icontains
+      value: "yes"
+    - type: icontains-any
+      value:
         - "14 days"
+        - "14-day"
 
 - description: Out of scope question
   vars:

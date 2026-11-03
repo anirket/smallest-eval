@@ -44,6 +44,11 @@ function failures(cases) {
   const lines = ['### Failures', ''];
   for (const c of failed) {
     lines.push(`**${caseName(c)}**`);
+    // An errored case (e.g. the API call failed) has no grading, only an error
+    if (!c.gradingResult) {
+      lines.push(`- error: ${String(c.error).split('\n')[0]}`, '');
+      continue;
+    }
     for (const check of c.gradingResult.componentResults) {
       if (!check.pass) lines.push(`- \`${check.assertion.type}\`: ${check.reason}`);
     }
