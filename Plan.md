@@ -35,7 +35,7 @@ open a PR ─► GitHub Action ─► promptfoo runs 10 cases from evals/cases.y
 
 **Done when:**
 - [ ] `anirket/smallest-eval` is a template repo, the badge on `main` is green, and the eval blocks a failing PR (the sabotage PR)
-- [x] `CALIBRATION.md` has a judge-vs-you number on held-out cases (agreement + Cohen's kappa + TPR/TNR) and the verbosity bias check
+- [x] The README's calibration section has a judge-vs-you number on held-out cases (agreement + Cohen's kappa + TPR/TNR) and the verbosity bias check
 - [x] The README states the calibration number
 
 **4 days, Nov 1 → Nov 4:** Day 1–2 learn (watch + hands-on), Day 3–4 build. Then smallest-eval is closed.
