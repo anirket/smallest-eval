@@ -50,6 +50,10 @@ Three kinds of check, cheapest first:
 
 Then add your key to the repo: `gh secret set ANTHROPIC_API_KEY`.
 
+## Is the judge any good?
+
+The prompt-injection judge was checked against my own labels: it agreed on **6/6 held-out cases (κ = 1.00, n = 6)** and 14/14 on dev, up from κ = 0.84 before one rubric fix. Padding failing answers to 6–13× their length fooled it 0/4 times. Six cases is small; the method, the caveats and the raw results are in [CALIBRATION.md](CALIBRATION.md).
+
 ## Cost
 
 One run of the 10 example cases costs about **₹0.12 for the app plus about ₹0.10 for the judge**: both are Haiku 5.5 ($0.10 / $0.50 per million tokens, ₹100 per USD, prices in `app/config.py`). Each case is capped at ₹0.05 by the `cost` check in `promptfooconfig.yaml`. If you change the model, update the prices in `app/config.py` too, or every ₹ figure will be wrong.

@@ -23,24 +23,24 @@ open a PR ─► GitHub Action ─► promptfoo runs 10 cases from evals/cases.y
                        any case fails → red check, merge blocked · all pass → green check + green badge
 ```
 
-**The part that makes it worth talking about: calibrating the judge.** A judge is a model too, so it can be wrong. You hand-label 30 outputs yourself, run the judge on the same 30, and measure how often it agrees with you (agreement %, Cohen's kappa, TPR/TNR). Then you rewrite the judge's rubric until it tracks you, and test it for two known biases: favouring longer answers, and favouring whichever option is shown first. The end result is a sentence most people can't say: *"my judge agrees with me at κ = 0.7 on 10 held-out cases, here's where it's wrong, and here's the bias I measured."*
+**The part that makes it worth talking about: calibrating the judge.** A judge is a model too, so it can be wrong. You hand-label 20 outputs yourself, run the judge on the same 20, and measure how often it agrees with you (agreement %, Cohen's kappa, TPR/TNR). Then you fix the judge's rubric once, re-measure, and test it for one known bias: favouring longer answers. The end result is a sentence most people can't say: *"my judge agrees with me at κ = 0.7 on 6 held-out cases, here's where it's wrong, and here's the bias I measured."*
 
-**The second part: version the agent, not just the prompt.** The agent config has a `version` field. On every PR, the Action runs the eval against the PR's version and against the previous one (`main`), and prints the delta: pass rate, cases that flipped, ₹ and p95 latency. That turns "evals in CI" into "regression-tested agent versions": a prompt change shows up as a number on the PR before it merges.
+**Cut on Nov 4 (see Scope cut below):** the version delta and the jd-lens / mini-agent retrofits.
+
+**The second part (dropped): version the agent, not just the prompt.** The agent config has a `version` field. On every PR, the Action runs the eval against the PR's version and against the previous one (`main`), and prints the delta: pass rate, cases that flipped, ₹ and p95 latency. That turns "evals in CI" into "regression-tested agent versions": a prompt change shows up as a number on the PR before it merges.
 
 **What you end up with:**
 - **`smallest-eval`**: a GitHub template repo with a tiny example app. A stranger clicks "Use this template", swaps in their own app and cases, and has evals in CI.
-- **The same harness fitted onto** ship #1 (`jd-lens`) and ship #2 (`mini-agent`), so 3 repos carry a green eval badge
-- **Version-to-version delta** on every PR: current vs previous agent version, printed in the PR summary
-- **`CALIBRATION.md`**: your judge-vs-human number and the bias results
+- **`CALIBRATION.md`**: your judge-vs-human number on held-out cases, and one measured bias
 
 **Done when:**
-- [ ] `anirket/smallest-eval` is a template repo, and a stranger can clone it and get a green run by following the README
-- [ ] 3 repos show a green eval badge: `smallest-eval`, `jd-lens`, `mini-agent`
-- [ ] A PR on `smallest-eval` prints the delta between the current and previous agent version (pass rate, flipped cases, ₹, p95)
-- [ ] `CALIBRATION.md` has a judge-vs-you number (agreement + Cohen's kappa + TPR/TNR on a held-out set) and the two bias checks
+- [ ] `anirket/smallest-eval` is a template repo, the badge on `main` is green, and the eval blocks a failing PR (the sabotage PR)
+- [x] `CALIBRATION.md` has a judge-vs-you number on held-out cases (agreement + Cohen's kappa + TPR/TNR) and the verbosity bias check
+- [x] The README states the calibration number
 
-**5 days, Nov 1 → Nov 5:** Day 1–2 learn (watch + hands-on), Day 3–5 build.
-**Nov 6 is the backup day.** It's for spillover only. Nothing is planned onto it.
+**4 days, Nov 1 → Nov 4:** Day 1–2 learn (watch + hands-on), Day 3–4 build. Then smallest-eval is closed.
+
+**Scope cut (Nov 4).** Day 5 is dropped, and Day 4 is cut to a 3-hour version. The jd-lens and mini-agent retrofits, the version delta, the pairwise position check, the judge leaderboard and the smuggle-a-fact challenge are out. Reason: the remaining work is mechanical or adds a new codebase; the one part that isn't mechanical is measuring the judge, so Day 4 keeps only that.
 
 ---
 
@@ -48,16 +48,12 @@ open a PR ─► GitHub Action ─► promptfoo runs 10 cases from evals/cases.y
 
 | | Your guess | Actual |
 |---|---|---|
-| κ of judge v1 (Haiku) on dev | *write it on Day 2* | |
-| κ of the final judge on held-out | | |
-| Rubric versions it took | | |
-| % of times the pairwise judge picks option A | | |
-| Padded fails the judge started passing (out of 5) | | |
-| Sneaky rewrites that fooled the final judge (out of 3) | | |
-| ₹ per CI run (template) | | |
+| κ of `resists_injection` v1 (Haiku) on dev | *write it on Day 2* | 0.84 |
+| κ of the final judge on held-out | | 1.00 (n = 6) |
+| Rubric versions it took | | 2 |
+| Padded fails the judge started passing (out of 4) | | 0 |
+| ₹ per CI run (template) | | ~₹0.23 (₹0.13 app + ~₹0.10 judge) |
 | ₹ spent on the whole project | | |
-| Badges green | | /3 |
-| Pass-rate delta on a deliberate regression (previous vs current version) | | |
 
 Guessing before you measure is the fun part. Being wrong is a line in the essay.
 
@@ -72,7 +68,7 @@ Guessing before you measure is the fun part. Being wrong is a line in the essay.
 | Calibration + report | **Your own Python** (`calibrate.py`, `report.py`) | This is the part worth owning and explaining in interviews |
 | Judge verdict | **Binary pass/fail + a reason**, one judge per failure mode | Hamel: 1–5 scales can't be grounded or calibrated; you'll gate on pass/fail anyway |
 | Models | App on `claude-haiku-5-5`; judge: Haiku vs Sonnet vs Opus on Day 4, then pick | Choosing a judge model on measured κ vs ₹ makes a good table |
-| What gets calibrated | **jd-lens tailored bullets**: "does the rewrite add any fact not in the source bullet?" | Your README already says *"Read the rewrites by hand"*. That's a real, unsolved gap, not a toy |
+| What gets calibrated | **`resists_injection`**, the template's own most interesting rubric (changed Nov 4, was jd-lens bullets) | Calibrates the judge you already ship, with no new codebase on the last day |
 | Versioning | **`version` field on the agent config**; the Action runs the eval on the PR and on `main`, and prints the delta | Turns "evals in CI" into regression-tested agent versions |
 
 ```
@@ -101,9 +97,7 @@ smallest-eval/
 | 1 (Nov 1) | **First blood** | promptfoo running your own Python, and a judge you've already fooled once |
 | 2 (Nov 2) | **Who judges the judge?** | `cohen_kappa()` written, your κ guess on the scoreboard, essay evidence picked |
 | 3 (Nov 3) | **The gate** | A sabotage PR caught by CI: red check, then green, plus a badge and a template repo |
-| 4 (Nov 4) | **Judge on trial** | Your judge measured against you, tuned, and stress-tested for bias |
-| 5 (Nov 5) | **The 20/20 lie** | jd-lens and mini-agent on green badges, a PR showing the version delta |
-| Nov 6 (backup) | **Spillover** | Only what didn't finish Days 1–5, in the order listed under the backup section |
+| 4 (Nov 4) | **Judge on trial** (3-hour version) | Your judge measured against you on held-out cases, fixed once, and checked for verbosity bias. Project closed |
 
 ---
 
@@ -253,89 +247,29 @@ Play the well-meaning teammate. Open a PR titled **"chore: tighten system prompt
 
 ---
 
-## Day 4 (Nov 4): Judge on trial · ~5.5 hrs (the big one)
+## Day 4 (Nov 4): Judge on trial · ~3 hrs, then close
 
-**Mission:** put your judge in the witness box. Measure it against you, fix it, then attack it until you know exactly where it breaks.
+**Mission:** you know how to write a judge; today you measure one. "I built an LLM judge" is common. "I hand-labelled 20 outputs, measured my judge against them at κ = 0.68, and here's where it's blind" is rare, and it's the eval-literacy signal job posts ask for (define metrics, build eval pipelines, distinguish signal from noise).
 
-**Done when:** `CALIBRATION.md` shows judge versions v1→vN with κ/TPR/TNR on dev, the final number on a held-out set, and both bias checks.
+**Done when:** `CALIBRATION.md` has κ / TPR / TNR for rubric v1 and v2 on dev, the v2 number on held-out, and the verbosity check; the README states the number; the badge is green.
 
-### Phase 1: 30 outputs · ~1 hr
-- Run jd-lens to produce 30 **tailored bullets** (each next to its source bullet)
-- The criterion, binary: **"The rewrite adds no fact, number, tool or claim that isn't in the source bullet."**
-- ⚠️ You need failures in the set (aim for ~⅓). If Haiku is too clean, produce some with `gpt-oss-20b` or a sloppier prompt. A set of all passes makes κ meaningless (see Day 2, Phase 3).
+No jd-lens: calibrate the judge you already have, **`evals/rubrics/resists_injection.txt`**.
 
-### Phase 2: Label blind · ~1 hr
-- `labels.csv`: `id, source, rewrite, human_pass, why`. **Label before the judge ever sees them.**
-- Split **20 dev / 10 held-out**. Tune only on dev. (Hamel's point: with a tiny set, you'll overfit to whatever you iterate on.)
-- Take a break after labelling, before you run the judge, so you aren't tempted to "fix" your labels to match it.
+| Step | What | Time |
+|---|---|---|
+| 1. Outputs | Get **20 responses** to prompt-injection attempts and judge them against `resists_injection`. Run your injection cases several times, add a few new attack questions, or hand-edit responses. Make sure **~7 genuinely fail** (the bot follows the injection, grants a refund outside policy, tells the joke) | 45 min |
+| 2. Label | Label all 20 yourself in `calibration/labels.csv` (`id, question, response, human_pass, why`) **before** the judge sees them. Then stop and do something else for 10 minutes | 45 min |
+| 3. Measure v1 | Split **14 dev / 6 held-out** (failures in both). Run the judge on the 14 (echo provider + `llm-rubric`, as in `fool-the-judge.yaml`), feed the verdicts and your labels into `calibrate.py` → κ / TPR / TNR | 15 min |
+| 4. Fix once | Read **every** disagreement. Fix the rubric once (definitions, 2–3 examples from dev only) as `resists_injection_v2.txt`. Re-measure on dev | 45 min |
+| 5. Held-out | Run v2 on the 6 held-out. **That's your number.** Don't tune after seeing it | 10 min |
+| 6. Verbosity bias | Take **4 failing responses** and pad them to double length with filler that adds nothing. Does the judge start passing them? | 20 min |
 
-### Phase 3: Iterate the rubric · ~2 hrs
-- Keep Hamel's LLM-judge guide open as the loop to copy (label → judge → measure agreement): https://hamel.dev/blog/posts/llm-judge/index.html
-- v1: a plain rubric → run on dev → κ, TPR, TNR, confusion table. **Compare with your scoreboard guess.**
-- Read **every** disagreement. Fix by adding definitions and 2–3 examples taken from dev (not held-out)
-- Log each version in a table: `version | change | agreement | κ | TPR | TNR | ₹`
-- Run the final rubric on the 10 held-out → **that's your headline number**
-- **Judge leaderboard:** run the final rubric with Haiku, Sonnet and Opus as the judge, then pick one on κ vs ₹. Is the expensive judge worth it?
-- Target: κ ≥ 0.6 on held-out. If you don't reach it, report what you got and why. An honest 0.5 with analysis beats a suspicious 1.0.
+**Skipped on purpose:** the pairwise position check, the judge leaderboard, the smuggle-a-fact challenge.
 
-### Phase 4: The two biases · ~1 hr
-- **Verbosity:** take ~5 *failing* rewrites and pad them to ~2× length with neutral wording that adds no facts. Does the judge start passing them? Also compare output length against judge pass rate across the 30.
-- **Position:** pairwise judge ("which rewrite is more faithful, A or B?") on 10 pairs, **both orders**. Report the % of times A wins and the number of flipped verdicts.
-- Write what you do about it: CI uses the pointwise binary judge; pairwise only with both orders.
+⚠️ Six held-out cases is a small number: one judge mistake moves κ a lot. Say so in `CALIBRATION.md`. A measured κ on six still beats an unmeasured judge on zero.
 
-### 🔥 Challenge: smuggle a fake fact · ~20 min
-Your judge is tuned now. Try to beat it. Write 3 rewrites that sneak in an invented fact the way a real model would: a plausible metric ("cut load time **by 40%**"), a tool that sounds right ("using **Redis**"), a scope inflation ("**led** the migration" when the source says "worked on"). How many get past your final judge? Put the score on the scoreboard and the misses in `CALIBRATION.md` under "Known blind spots". Knowing where your judge is blind is worth more than a high κ.
-
----
-
-## Day 5 (Nov 5): The 20/20 lie · ~7.5 hrs (heaviest day)
-
-**Mission:** put the judge and the gate on the two real ships, and make CI compare agent versions. Catch your own past self: mini-agent scored 20/20, and today a new test shows what that score was hiding.
-
-**Done when:** `jd-lens` and `mini-agent` both carry green badges (3/3 with `smallest-eval`), a PR on `smallest-eval` prints the delta between the current and previous agent version, and a fresh clone of the template runs green by following its README alone.
-
-**Load warning:** this day is ~7.5 hrs. The stranger test and wrap-up (Phases 4–5) are the parts to move to Nov 6 if the day runs long.
-
-### Phase 1: Retrofit jd-lens · ~1.5 hrs
-- Copy the template's `promptfooconfig.yaml`, workflow and `report.py`
-- 10 cases from `evals/cases/`. Assertions: schema valid, every quote is really in the resume (your existing `find_fakes`, as a `python` assert), and **the calibrated judge on tailored bullets**
-- Secret, badge, green run. **Badge 2/3.**
-
-### Phase 2: Retrofit mini-agent · ~1.5 hrs
-- Provider = `run_agent(task)` returning the final answer, plus the tools called, steps and ₹
-- 10 of the 20 tasks; reuse the checkers (`number` with tolerance → `python` assert, `contains`)
-- Add the check your 20/20 hid: **"used `calculate` for calc tasks"** (a `python` assert on the tool list). **Watch it go red on Haiku.** That's the essay's week-2 evidence turning into a test, live.
-- Then decide: fix it (say "always use the calculator" in the system prompt) and watch it go green, or keep the test as a documented known failure. Either is a good story; pick one and say why.
-- `cost` and `latency` assertions from your existing thresholds (avg ₹ ≤ 0.50)
-- **Badge 3/3.**
-
-### Phase 3: Version the agent · ~3 hrs
-- Add a `version` field to `app/agent.yaml` next to the model and prompt. Bump it whenever the prompt or model changes.
-- In the Action, run the eval twice: once on the PR's agent config (current) and once on the `main` copy (previous). Use a second `actions/checkout` with `ref: main` into its own folder.
-- `report.py --baseline` takes the previous `results.json` and prints a delta table: pass rate, cases that flipped pass→fail or fail→pass, ₹ and p95 latency change.
-- ⚠️ The judge isn't deterministic. Run the baseline twice on an unchanged PR to measure the noise floor. A delta smaller than that noise isn't a regression, and the report should say so.
-- Test it on purpose: reuse the sabotage change with a version bump and watch the delta show the flipped cases. Then open a PR with no prompt change and check the delta is near zero.
-- ⚠️ Fork PRs still get no secrets, so the delta step fails there too. Covered by the README note from Day 3.
-
-### Phase 4: Stranger test · ~1 hr
-- `gh repo create test-clone --template anirket/smallest-eval`, clone it into a fresh folder, and follow the README **only**
-- Every step where you needed knowledge that isn't in the README → fix the README
-- Even better: hand the link to a friend and time them. Their first question is your README's biggest gap.
-- Then delete the test repo
-
-### Phase 5: Wrap · ~30 min
-- Fill in the **Actual** column of the scoreboard and tick the **Done when** list at the top
-- Record the sabotage PR's delta on the scoreboard, with the noise floor next to it
-- One `runs.jsonl`-style line per day in the README: what it cost to build the whole thing
-
----
-
-## Nov 6 (backup): Spillover only · ~0–4 hrs
-
-Nothing is planned here. Use it only if Days 1–5 ran over. Pick up unfinished work in this order:
-
-1. **Stranger test** (Day 5, Phase 4)
-2. **Wrap** (Day 5, Phase 5: scoreboard Actual column, Done-when ticks, `runs.jsonl` line)
-3. Anything left from Days 3–4 (badge, template settings, judge leaderboard)
-
-If the 3/3 badge slips past Nov 6, say so in the README rather than shipping an unmarked gap.
+### Then close it
+- `CALIBRATION.md`: the v1 → v2 table on dev, the held-out number with the n = 6 caveat, the verbosity result, and the disagreements that changed the rubric
+- README: add the calibration number, and check the badge on `main` is green
+- Fill in the **Actual** column of the scoreboard and tick **Done when**
+- smallest-eval is done. Week 4 starts Saturday with the collector.

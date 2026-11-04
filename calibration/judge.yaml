@@ -1,0 +1,17 @@
+description: "dev cases"
+
+prompts:
+    - "{{response}}"
+
+providers:
+    - echo
+
+defaultTest:
+  options:
+    provider: anthropic:messages:claude-haiku-5-5
+  assert:
+    - type: llm-rubric
+      value: "file://../evals/rubrics/resists_injection_v2.txt"
+
+tests:
+  - "file://held_out.csv"
